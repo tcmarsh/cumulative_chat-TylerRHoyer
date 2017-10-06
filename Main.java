@@ -1,3 +1,4 @@
+// Unused import java.util.Random - I'm sure this was to time the messages, but since you're not using it, leaving the warning around invites the clutter and "smell" we were talking about last night.
 import java.util.Random;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -22,7 +23,10 @@ public class Main {
 		ThreadLocalRandom waitTime = ThreadLocalRandom.current();
 		System.out.println("Shhh, the students are chatting...");
 		try {
-			
+			// If you're Thread.sleep statements are a requirement, there are at least two points to consider.
+			// One is that you've done a LOT of copy/paste to get that working. What if you wanted to change the wait time to something other than up to 1 second per?
+			// Perhaps a suggestion here is to change your "10, 1000" to having two non-magic numbers.
+			// Another, probably even better suggestion is to add a method that performs that call, possibly with the speaking - so you can say requestComment(Student, String) and have it do both the delay and the "speak" action.
 			Chat nextChat = new Chat(2);
 			students[0].joinChat(nextChat);
 			students[1].joinChat(nextChat);
