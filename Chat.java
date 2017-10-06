@@ -1,56 +1,37 @@
 import java.util.LinkedList;
+import java.util.Vector;
 
-public class Chat implements Comparable<Chat>{
+public class Chat {
 		
-	private int roomSize;
-	private int curSize;
-	private Student[] students;
+	private Vector<Student> students;
 	private LinkedList<ChatEvent> events;
 
-	public Chat(int roomSize) {
-		this.roomSize = roomSize;
-		this.students = new Student[roomSize];
-		this.events = new LinkedList<ChatEvent>();
-		this.curSize = 0;
+	public Chat() {
+		students = new Vector<>();
+		events = new LinkedList<>();
 	};
 	
-	//Where the heck are my C++ "friends"? This sucks.
-	protected void addStudent(Student newStudent) throws Error {
-		if (curSize < roomSize) {
-			events.add(new ChatEvent(newStudent, ChatEventType.CONNECTION_OPEN, "[USER CONNECTED]"));
-			students[curSize++] = newStudent;
-		} else {
-			throw new Error("This chat room is already full");
-		}
-	}
-	
-	protected void removeStudent(Student oldStudent) {
-		for (int i = 0; i < this.roomSize; i++) {
-			if (students[i] == oldStudent) {
-				if (i == curSize) {
-					students[--curSize] = null;
-				} else {
-					students[i] = students[--curSize];
-					students[curSize] = null;
-				}
-				events.add(new ChatEvent(oldStudent, ChatEventType.CONNECTION_CLOSE, "[USER DISCONNECTED]"));
-			}
-		}
-	}
-	
-	protected void addMessage(Student sender, String message) {
-		events.add(new ChatEvent(sender, ChatEventType.MESSAGE, message));
-	}
-	
-	public String toString() {
-		String dialog = "";
+	void addStudent(Student newStudent) throws Error {
+		students.add(newStudent);
+		events.add(new ChatEvent(newStudent, ChatEventType.CONNECTION_OPEN, "[USER CONNECTED]"));
 		for (ChatEvent event : events) {
-			dialog += event;
+			newStudent.listen(this, event.toString());
 		}
-		return dialog;
 	}
 	
-	public int compareTo(Chat other) {
-		return this.students[0].toString().compareTo(other.students[0].toString());
+	void removeStudent(Student oldStudent) {
+		students.remove(oldStudent);
+		ChatEvent newEvent = new ChatEvent(oldStudent, ChatEventType.CONNECTION_CLOSE, "[USER DISCONNECTED]");
+		events.add(newEvent);
+		addMessage(oldStudent, newEvent.toString());
 	}
+	
+	void addMessage(Student sender, String message) {
+		ChatEvent newEvent = new ChatEvent(sender, ChatEventType.MESSAGE, message);
+		events.add(newEvent);
+		for (Student student : students) {
+			student.listen(this, newEvent.toString());
+		}
+	}
+
 }	
