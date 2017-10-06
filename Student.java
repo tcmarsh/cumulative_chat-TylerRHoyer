@@ -1,7 +1,9 @@
 
 public class Student {
 	
+	// Student has only name, not "first name"/"last name", and also has no "score": -10 pts
 	private String name;
+	// Single Responsibility Principle again - using the Chat object to represent to disparate functionalities may seem "clever", but is in reality more likely to cause bugs or misunderstanding, AND makes it so that you have more than one reason why that class could change. This introduces issues from a maintainability standpoint.
 	private Chat history;
 	private Chat chat;
 	
