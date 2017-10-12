@@ -20,7 +20,10 @@ public class Student {
 	}
 	
 	public Student(Socket client) throws IOException {
-		out.add(new PrintWriter(client.getOutputStream()));
+		OutputStream output = client.getOutputStream();
+		PrintWriter printer = new PrintWriter(output);
+		out.add(printer);
+		
 		BufferedReader in = new BufferedReader(new InputStreamReader(client.getInputStream()));
 		out.get(0).println("ACK");
 		name = in.readLine();
@@ -36,7 +39,16 @@ public class Student {
 	}
 	
 	public int connect(Socket server) throws IOException {
-		out.add(new PrintWriter(server.getOutputStream()));
+		while (!server.isConnected()) {
+			try {
+				Thread.sleep(1000);
+			} catch(InterruptedException e) {
+				System.out.println("Not Connected");
+			}
+		}
+		OutputStream output = server.getOutputStream();
+		PrintWriter printer = new PrintWriter(output);
+		out.add(printer);
 		
 		BufferedReader in = new BufferedReader(new InputStreamReader(server.getInputStream()));
 		Listener listener = () -> {

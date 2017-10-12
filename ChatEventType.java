@@ -1,4 +1,0 @@
-
-public enum ChatEventType {
-	MESSAGE, CONNECTION_CLOSE, CONNECTION_OPEN
-}

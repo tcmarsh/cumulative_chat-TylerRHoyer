@@ -1,6 +1,9 @@
+import java.io.IOException;
+import java.net.Socket;
+
 public class Main {
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException, InterruptedException {
 		
 		Student[] students = new Student[] {
 			new Student("Justin Behunin"),
@@ -16,20 +19,22 @@ public class Main {
 		ChatWindow window = new ChatWindow();
 	
 		Chat nextChat = new Chat();
-		window.joinGroup(nextChat);
-		nextChat.addStudent(students[0]);
-		nextChat.addStudent(students[1]);
-		nextChat.addMessage(students[0], "Hey, I'm Justin.");
-		nextChat.addMessage(students[1], "I'm Kenyon.");
-		nextChat.addMessage(students[0], "Have you started on the Chat assignment yet?");
-		nextChat.addMessage(students[1], "Nope. You?");
-		nextChat.addMessage(students[0], "Yeah. I started it last class.");
-		nextChat.addMessage(students[1], "Hey, that's cheating!");
-		nextChat.addMessage(students[0], "... I paid for it.");
-		nextChat.addMessage(students[1], "Doesn't matter");
-		nextChat.addMessage(students[0], "It isn't cheating anyways");
-		nextChat.addMessage(students[1], "-.-");
-		
+		window.connect("localhost");
+		students[0].connect(new Socket("localhost", 8090));
+		students[1].connect(new Socket("localhost", 8090));
+		students[0].speak(0, "Hey, I'm Justin.");
+		students[1].speak(0, "I'm Kenyon.");
+		students[0].speak(0, "Have you started on the Chat assignment yet?");
+		students[1].speak(0, "Nope. You?");
+		students[0].speak(0, "Yeah. I started it last class.");
+		students[1].speak(0, "Hey, that's cheating!");
+		students[0].speak(0, "... I paid for it.");
+		students[1].speak(0, "Doesn't matter");
+		students[0].speak(0, "It isn't cheating anyways");
+		students[1].speak(0, "-.-");
+		Thread.sleep(1000);
+		nextChat.close();
+		/*
 		nextChat = new Chat();
 		window.joinGroup(nextChat);
 		nextChat.addStudent(students[2]);
@@ -74,6 +79,7 @@ public class Main {
 		nextChat.addMessage(students[7], "I have have to get it done. That's code word for scat, dog!");
 		nextChat.addMessage(students[6], "Oh, alright. I just thought we were friends.");
 		nextChat.addMessage(students[7], "Just keep walking. Homework comes first.");
+		*/
 	}
 
 }

@@ -1,5 +1,7 @@
 import java.awt.*;
 import java.awt.event.*;
+import java.io.IOException;
+import java.net.Socket;
 import java.util.Vector;
 import javax.swing.*;
 import javax.swing.text.JTextComponent;
@@ -20,7 +22,6 @@ public class ChatWindow extends JFrame {
 	
 	private boolean isChatExpanded = false;
 	
-	private Vector<Chat> chats = new Vector<>();
 	private Vector<JPanel> panels = new Vector<>();
 	private Student owner;
 	
@@ -70,31 +71,26 @@ public class ChatWindow extends JFrame {
 		setVisible(true);
 	}
 	
-	private void onLogin() {
-		owner = new Student(username.getText());
-		
+	private void onLogin(){
 		remove(loginPanel);
 		add(chatPanel);
 		add(messagePanel, BorderLayout.SOUTH);
-
-		for (Chat chat : chats)
-			chat.addStudent(owner);
-
+		
+		owner = new Student(username.getText());
+		
 		pack();
 		revalidate();
 		repaint();
 	}
 	
 	private void onSend() {
-		Chat chat = chats.elementAt(chatPane.getSelectedIndex());
-		chat.addMessage(owner, isChatExpanded ? messageArea.getText() : messageField.getText());
-		
+		owner.speak(chatPane.getSelectedIndex(), isChatExpanded ? messageArea.getText() : messageField.getText());
 		messageArea.setText("");
 		messageField.setText("");
 	}
 	
-	void onRecieve(String msg, Chat chat) {
-		JPanel panel = panels.get(chats.indexOf(chat));
+	void onRecieve(String msg, int id) {
+		JPanel panel = panels.get(id);
 		
 		JLabel msgLabel = new JLabel();
 		msgLabel.setText(msg);
@@ -106,9 +102,16 @@ public class ChatWindow extends JFrame {
 		repaint();
 	}
 	
-	void joinGroup(Chat chat) {
-		chats.add(chat);
-		
+	void connect(String address) throws IOException {
+		while (owner == null) {
+			try {
+				Thread.sleep(500);
+			} catch (InterruptedException e) {
+				
+			}
+		}
+		owner.connect(new Socket(address, 8090));
+			
 		JPanel panel = new JPanel();
 		panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
 		panels.add(panel);
@@ -116,9 +119,6 @@ public class ChatWindow extends JFrame {
 		JScrollPane scrollPane = new JScrollPane(panel);
 		scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		chatPane.addTab("Group", scrollPane);
-		
-		if (owner != null)
-			chat.addStudent(owner);
 	}
 	
 	private class ToggleChat extends AbstractAction {
