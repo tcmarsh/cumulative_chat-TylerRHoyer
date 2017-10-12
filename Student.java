@@ -17,12 +17,12 @@ public class Student {
 	
 	public Student(String name) {
 		this.name = name;
+		out = new Vector<>();
 	}
 	
 	public Student(Socket client) throws IOException {
-		OutputStream output = client.getOutputStream();
-		PrintWriter printer = new PrintWriter(output);
-		out.add(printer);
+		out = new Vector<>();
+		out.add(new PrintWriter(client.getOutputStream()));
 		
 		BufferedReader in = new BufferedReader(new InputStreamReader(client.getInputStream()));
 		out.get(0).println("ACK");
@@ -46,9 +46,7 @@ public class Student {
 				System.out.println("Not Connected");
 			}
 		}
-		OutputStream output = server.getOutputStream();
-		PrintWriter printer = new PrintWriter(output);
-		out.add(printer);
+		out.add(new PrintWriter(server.getOutputStream()));
 		
 		BufferedReader in = new BufferedReader(new InputStreamReader(server.getInputStream()));
 		Listener listener = () -> {
