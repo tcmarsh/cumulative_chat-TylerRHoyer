@@ -1,7 +1,9 @@
-import java.util.LinkedList;
-import java.util.Vector;
+import java.util.*;
+import java.io.*;
+import java.net.*;
+import java.lang.*;
 
-public class Chat {
+public class Chat implements Runnable {
 		
 	private Vector<Student> students;
 	private LinkedList<ChatEvent> events;
@@ -9,6 +11,8 @@ public class Chat {
 	public Chat() {
 		students = new Vector<>();
 		events = new LinkedList<>();
+		Thread listenerThread = new Thread(this);
+		listenerThread.start();
 	};
 	
 	void addStudent(Student newStudent) throws Error {
@@ -32,6 +36,19 @@ public class Chat {
 		for (Student student : students) {
 			student.listen(this, newEvent.toString());
 		}
+	}
+	
+	public void run() {
+		ServerSocket listener = new ServerSocket(8090);
+        try {
+            while (true) {
+				Student newStudent = new Student(listener.accept());
+                addStudent(newStudent);
+            }
+        }
+        finally {
+            listener.close();
+        }
 	}
 
 }	
