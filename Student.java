@@ -1,43 +1,65 @@
 import java.util.*;
 import java.io.*;
 import java.net.*;
-import java.lang.*;
 
-public class Student implements Runnable {
+public class Student {
 	
 	private String name;
-	private ChatWindow client;
-	private PrintWriter out;
-	private BufferedReader in;
+	private Vector<PrintWriter> out;
+	
+	
+	private static interface Listener extends Runnable {
+		public void listen();
+		public default void run() {
+			while (true) listen();
+		}
+	}
 	
 	public Student(String name) {
 		this.name = name;
 	}
 	
-	public Student(Socket client) {
-		out = new PrintWriter(client.getOutputStream(), true);
-		in = new BufferedReader(client.getInputStream(), true);
-		Thread listenerThread = new Thread(this);
-		listenerThread.start();
+	public Student(Socket client) throws IOException {
+		out.add(new PrintWriter(client.getOutputStream()));
+		BufferedReader in = new BufferedReader(new InputStreamReader(client.getInputStream()));
+		out.get(0).println("ACK");
+		name = in.readLine();
+		
+		Listener listener = () -> {
+			try {
+				in.readLine();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		};
+		new Thread(listener).start();
 	}
 	
-	void listen(Chat chat, String message) {
-		if (client != null)
-			client.onRecieve(message, chat);
+	public int connect(Socket server) throws IOException {
+		out.add(new PrintWriter(server.getOutputStream()));
+		
+		BufferedReader in = new BufferedReader(new InputStreamReader(server.getInputStream()));
+		Listener listener = () -> {
+			try {
+				in.readLine();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		};
+		new Thread(listener).start();
+		
+		return out.size() - 1;
 	}
 	
-	void setClient(ChatWindow client) {
-		this.client = client;
+	void speak(int groupID, String message) {
+		out.get(groupID).println(message);
+	}
+	
+	void listen(String message) {
+		out.get(0).println(message);
 	}
 	
 	public String toString() {
 		return name;
-	}
-	
-	public void run() {
-        out.println(new Date().toString());
-		while (true) {
-			String message = in.readLine();
-		}
 	}
 }

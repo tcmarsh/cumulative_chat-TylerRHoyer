@@ -1,12 +1,13 @@
 import java.util.*;
 import java.io.*;
 import java.net.*;
-import java.lang.*;
 
 public class Chat implements Runnable {
 		
 	private Vector<Student> students;
 	private LinkedList<ChatEvent> events;
+	private ServerSocket listener;
+	private boolean isRunning = true;
 
 	public Chat() {
 		students = new Vector<>();
@@ -15,12 +16,21 @@ public class Chat implements Runnable {
 		listenerThread.start();
 	};
 	
+	void close() {
+		isRunning = false;
+		try {
+			listener.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
 	void addStudent(Student newStudent) throws Error {
 		students.add(newStudent);
 		events.add(new ChatEvent(newStudent, ChatEventType.CONNECTION_OPEN, "[USER CONNECTED]"));
-		for (ChatEvent event : events) {
-			newStudent.listen(this, event.toString());
-		}
+		
+		for (ChatEvent event : events)
+			newStudent.listen(event.toString());
 	}
 	
 	void removeStudent(Student oldStudent) {
@@ -33,21 +43,18 @@ public class Chat implements Runnable {
 	void addMessage(Student sender, String message) {
 		ChatEvent newEvent = new ChatEvent(sender, ChatEventType.MESSAGE, message);
 		events.add(newEvent);
-		for (Student student : students) {
-			student.listen(this, newEvent.toString());
-		}
+		
+		for (Student student : students)
+			student.listen(newEvent.toString());
 	}
 	
 	public void run() {
-		ServerSocket listener = new ServerSocket(8090);
         try {
-            while (true) {
-				Student newStudent = new Student(listener.accept());
-                addStudent(newStudent);
-            }
-        }
-        finally {
-            listener.close();
+    		listener = new ServerSocket(8090);
+            while (isRunning)
+                addStudent(new Student(listener.accept()));
+        } catch (IOException e) {
+			e.printStackTrace();
         }
 	}
 

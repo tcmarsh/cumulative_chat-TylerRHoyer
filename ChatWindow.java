@@ -3,8 +3,6 @@ import java.awt.event.*;
 import java.util.Vector;
 import javax.swing.*;
 import javax.swing.text.JTextComponent;
-import java.io.*;
-import java.net.*;
 
 public class ChatWindow extends JFrame {
 	private static final long serialVersionUID = 1L;
@@ -74,7 +72,6 @@ public class ChatWindow extends JFrame {
 	
 	private void onLogin() {
 		owner = new Student(username.getText());
-		owner.setClient(this);
 		
 		remove(loginPanel);
 		add(chatPanel);
