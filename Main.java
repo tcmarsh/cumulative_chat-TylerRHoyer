@@ -1,27 +1,27 @@
 import java.io.IOException;
-import java.net.Socket;
 
 public class Main {
 
 	public static void main(String[] args) throws IOException, InterruptedException {
 		
 		Student[] students = new Student[] {
-			new Student("Justin Behunin"),
-			new Student("Kenyon Brown"),
-			new Student("Austin Forsling"),
-			new Student("Nicholas Goldberg"),
-			new Student("Tyler Hoyer"),
-			new Student("Steven Julien"),
-			new Student("Jonathan Mirabile"),
-			new Student("Christopher Nash"),
+			new Student(null, "Justin Behunin"),
+			new Student(null, "Kenyon Brown"),
+			new Student(null, "Austin Forsling"),
+			new Student(null, "Nicholas Goldberg"),
+			new Student(null, "Tyler Hoyer"),
+			new Student(null, "Steven Julien"),
+			new Student(null, "Jonathan Mirabile"),
+			new Student(null, "Christopher Nash"),
 		};
 		
 		ChatWindow window = new ChatWindow();
 	
 		Chat nextChat = new Chat();
 		window.connect("localhost");
-		students[0].connect(new Socket("localhost", 8090));
-		students[1].connect(new Socket("localhost", 8090));
+		students[0].connect("localhost");
+		students[1].connect("localhost");
+		Thread.sleep(1000);
 		students[0].speak(0, "Hey, I'm Justin.");
 		students[1].speak(0, "I'm Kenyon.");
 		students[0].speak(0, "Have you started on the Chat assignment yet?");
@@ -32,8 +32,9 @@ public class Main {
 		students[1].speak(0, "Doesn't matter");
 		students[0].speak(0, "It isn't cheating anyways");
 		students[1].speak(0, "-.-");
-		Thread.sleep(1000);
+		Thread.sleep(10000);
 		nextChat.close();
+		
 		/*
 		nextChat = new Chat();
 		window.joinGroup(nextChat);

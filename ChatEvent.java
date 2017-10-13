@@ -12,6 +12,6 @@ public class ChatEvent {
 	}
 	
 	public String toString() {
-		return "(" + time + ") " + student + ": " + content + "\n";
+		return "(" + time + ") " + student + ": " + content;
 	}
 }

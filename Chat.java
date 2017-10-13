@@ -2,7 +2,7 @@ import java.util.*;
 import java.io.*;
 import java.net.*;
 
-public class Chat implements Runnable {
+public class Chat extends Thread {
 		
 	private Vector<Student> students;
 	private LinkedList<ChatEvent> events;
@@ -13,13 +13,13 @@ public class Chat implements Runnable {
 		students = new Vector<>();
 		events = new LinkedList<>();
 		addMessage(null, "[SERVER STARTED]");
-		Thread listenerThread = new Thread(this);
-		listenerThread.start();
+		this.start();
 	};
 	
 	void close() {
 		isRunning = false;
 		addMessage(null, "[SERVER SHUTDOWN]");
+		System.out.println("Shutting Down Server");
 		try {
 			listener.close();
 		} catch (IOException e) {
@@ -27,7 +27,6 @@ public class Chat implements Runnable {
 		}
 	}
 	
-	//How is this being called?
 	void removeStudent(Student oldStudent) {
 		students.remove(oldStudent);
 		ChatEvent newEvent = new ChatEvent(oldStudent, "[USER DISCONNECTED]");
@@ -36,6 +35,7 @@ public class Chat implements Runnable {
 	}
 	
 	void addMessage(Student sender, String message) {
+		System.out.println("Server relaying message");
 		ChatEvent newEvent = new ChatEvent(sender, message);
 		events.add(newEvent);
 		for (Student student : students)
@@ -46,9 +46,15 @@ public class Chat implements Runnable {
         try {
     		listener = new ServerSocket(8090);
             while (isRunning) {
-                Student newStudent = new Student(listener.accept());
-	            students.add(newStudent);
-	    		addMessage(newStudent, "[USER CONNECTED]");
+            	System.out.println("server waiting for connections");
+            	try {
+	                Student newStudent = new Student(this, listener.accept());
+		            students.add(newStudent);
+		    		addMessage(newStudent, "[USER CONNECTED]");
+            	} catch (IOException e) {
+            		//It is okay... the server is probably shutting down... probably...
+            		this.interrupt();
+            	}
             }
         } catch (IOException e) {
 			e.printStackTrace();
