@@ -9,7 +9,6 @@ public class ChatWindow extends JFrame {
 	
 	private JPanel loginPanel;
 	private JTextField username;
-	private JButton login;
 	
 	private JPanel chatPanel;
 	private JTabbedPane chatPane;
@@ -33,7 +32,7 @@ public class ChatWindow extends JFrame {
 		username.setPreferredSize(new Dimension(200, 30));
 		loginPanel.add(username);
 		
-		login = new JButton();
+		JButton login = new JButton();
 		login.setText("Log in");
 		login.setPreferredSize(new Dimension(120, 30));
 		login.addActionListener(event -> onLogin());
