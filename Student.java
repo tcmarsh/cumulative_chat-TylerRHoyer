@@ -50,6 +50,7 @@ public class Student {
 		}).start();
 	}
 	
+	// Student should not have any responsibility for a client or server - it's a Student. Where'd that come from?
 	//Client connecting to Server
 	public int connect(String address) throws IOException {
 		Socket server = new Socket(address, 8090);
@@ -89,6 +90,7 @@ public class Student {
 							} catch (IOException e1) {
 								e1.printStackTrace();
 							}
+							// You don't need to call interrupt on a thread if you're in it - it will finish as sone as you're tasks are complete (like setting isRunning to false)
 							this.interrupt();
 						} else {
 							e.printStackTrace();
@@ -116,6 +118,7 @@ public class Student {
 		}
 	}
 	
+	// "speak" and "listen" are both misnomers - you open your mouth to listen? (output on speak and on listen) - Our naming convention in our code should reflect what we're doing
 	void listen(String message) {
 		out.get(0).println(message);
 		out.get(0).flush();
