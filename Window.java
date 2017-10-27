@@ -5,7 +5,7 @@ import java.util.Vector;
 import javax.swing.*;
 import javax.swing.text.JTextComponent;
 
-public class ChatWindow extends JFrame {
+public class Window extends JFrame {
 	private static final long serialVersionUID = 1L;
 	
 	private JPanel loginPanel;
@@ -23,9 +23,10 @@ public class ChatWindow extends JFrame {
 	private boolean isChatExpanded = false;
 	
 	private Vector<JPanel> panels = new Vector<>();
-	private Student owner;
+	private Client client;
 	
-	public ChatWindow() {
+	public Window(Client client) {
+		this.client = client;
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		loginPanel = new JPanel();
 		
@@ -67,7 +68,7 @@ public class ChatWindow extends JFrame {
 		sendButton = new JButton();
 		sendButton.setPreferredSize(new Dimension(75, 30));
 		sendButton.setText("Send");
-		sendButton.addActionListener(event -> onSend());
+		sendButton.addActionListener(event -> clearChat());
 		messagePanel.add(sendButton);
 		
 		add(loginPanel);
@@ -81,9 +82,8 @@ public class ChatWindow extends JFrame {
 		add(chatPanel);
 		add(messagePanel, BorderLayout.SOUTH);
 		
-		owner = new Student(this, username.getText());
 		try {
-			connect(address.getText());
+			client.connect(username.getText(), address.getText());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -93,17 +93,16 @@ public class ChatWindow extends JFrame {
 		repaint();
 	}
 	
-	private void onSend() {
-		owner.speak(chatPane.getSelectedIndex(), isChatExpanded ? messageArea.getText() : messageField.getText());
+	private void clearChat() {
+		client.send(chatPane.getSelectedIndex(), isChatExpanded ? messageArea.getText() : messageField.getText());
 		messageArea.setText("");
 		messageField.setText("");
 	}
 	
-	void onRecieve(String msg, int id) {
-		System.out.println("Client printing message");
+	void display(int tabID, String msg) {
 		System.out.println(msg);
-		System.out.println(id);
-		JPanel panel = panels.get(id);
+		System.out.println(tabID);
+		JPanel panel = panels.get(tabID);
 		
 		JLabel msgLabel = new JLabel();
 		msgLabel.setText(msg);
@@ -115,30 +114,18 @@ public class ChatWindow extends JFrame {
 		repaint();
 	}
 	
-	int  connect(String address) throws IOException {
-		while (owner == null) {
-			try {
-				Thread.sleep(500);
-			} catch (InterruptedException e) {
-				
-			}
-		}
-		int id = owner.connect(address);
-			
+	int  addTab(int tabID, String address) throws IOException {
 		JPanel panel = new JPanel();
 		panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
 		panels.add(panel);
 		
 		JScrollPane scrollPane = new JScrollPane(panel);
 		scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-		chatPane.addTab("Group", scrollPane);
+		chatPane.addTab(address, scrollPane);
 		
-		return id;
+		return tabID;
 	}
 	
-	void disconnect(int id) {
-		owner.disconnect(id);	
-	}
 	
 	private class ToggleChat extends AbstractAction {
 		private static final long serialVersionUID = 1L;
